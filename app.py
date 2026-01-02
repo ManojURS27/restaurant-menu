@@ -8,7 +8,6 @@ class MenuItem:
         self.name = name
         self.price = price
 
-# Updated menu_data to match your image exactly
 menu_data = {
     "Starters": [
         MenuItem("Gobi Manchurian", 130.00 ),
@@ -41,7 +40,6 @@ menu_data = {
 }
 
 def get_item_price(name):
-    """Helper to find price from the server-side menu data."""
     for category in menu_data.values():
         for item in category:
             if item.name == name:
@@ -89,4 +87,5 @@ def clear_cart():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+
     app.run(debug=True)
