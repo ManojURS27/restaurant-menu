@@ -50,16 +50,12 @@ def get_item_price(name):
 def index():
     if 'cart' not in session:
         session['cart'] = {}
-    
-    total = sum(item['price'] * item['quantity'] for item in session['cart'].values())
-    return render_template('index.html', menu=menu_data, cart=session['cart'], total=total)
+    return render_template('index.html', menu=menu_data, cart=session['cart'])
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     name = request.form.get('name')
     qty = int(request.form.get('quantity', 1))
-    
-    # Securely get price from our menu_data, not the user's form
     price = get_item_price(name)
     
     cart = session.get('cart', {})
@@ -76,10 +72,19 @@ def add_to_cart():
 def remove_item(name):
     cart = session.get('cart', {})
     if name in cart:
-        del cart[name]
+        if cart[name]['quantity'] > 1:
+            cart[name]['quantity'] -= 1
+        else:
+            del cart[name]
         session['cart'] = cart
         session.modified = True
     return redirect(url_for('index'))
+
+@app.route('/checkout')
+def checkout():
+    cart = session.get('cart', {})
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    return render_template('checkout.html', cart=cart, total=total)
 
 @app.route('/clear')
 def clear_cart():
@@ -87,5 +92,4 @@ def clear_cart():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-
     app.run(debug=True)
