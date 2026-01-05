@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Order Summary</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .total-row { font-size: 1.5em; font-weight: bold; text-align: right; margin-top: 20px; color: #d9534f; }
+        .back-link { display: inline-block; margin-top: 20px; color: #5bc0de; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>Order Summary</h1>
+    
+    {% for name, details in cart.items() %}
+    <div class="item-row">
+        <span>{{ name }} (x{{ details.quantity }})</span>
+        <span>₹{{ details.price * details.quantity }}</span>
+    </div>
+    {% endfor %}
+
+    <div class="total-row">
+        Total: ₹{{ total }}
+    </div>
+
+    <hr>
+    <a href="{{ url_for('index') }}" class="back-link">← Back to Menu</a>
+    <a href="{{ url_for('clear_cart') }}" style="float: right; color: #d9534f; margin-top: 20px;">Clear All</a>
+</body>
+</html>
