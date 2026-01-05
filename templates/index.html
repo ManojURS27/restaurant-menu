@@ -9,10 +9,11 @@
         .category-title { border-bottom: 2px solid #333; margin-top: 30px; text-transform: uppercase; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
         .price { font-weight: bold; margin-right: 15px; }
-        .cart-section { background: #f4f4f4; padding: 20px; margin-top: 40px; border-radius: 8px; border: 1px solid #ddd; }
-        .remove-btn { color: #d9534f; text-decoration: none; font-size: 0.8em; margin-left: 10px; }
-        .btn-add { background: #5cb85c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
-        input[type="number"] { width: 45px; padding: 4px; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-circle { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #333; background: white; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #5cb85c; color: white; border: none; padding: 5px 15px; border-radius: 3px; cursor: pointer; }
+        .view-cart-btn { display: block; background: #333; color: white; text-align: center; padding: 15px; text-decoration: none; margin-top: 20px; border-radius: 5px; }
+        .badge { background: #d9534f; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -27,37 +28,30 @@
             <div>
                 <span>{{ item.name }}</span>
                 <span class="price">- ₹{{ item.price }}</span>
+                {% if cart[item.name] %}
+                <span class="badge">In Cart: {{ cart[item.name].quantity }}</span>
+                {% endif %}
             </div>
-            <form action="{{ url_for('add_to_cart') }}" method="POST">
-                <input type="hidden" name="name" value="{{ item.name }}">
-                <input type="number" name="quantity" value="1" min="1">
-                <button type="submit" class="btn-add">Add</button>
-            </form>
+            
+            <div class="qty-controls">
+                <a href="{{ url_for('remove_item', name=item.name) }}"><button class="btn-circle">-</button></a>
+                
+                <span>{{ cart[item.name].quantity if item.name in cart else 0 }}</span>
+                
+                <form action="{{ url_for('add_to_cart') }}" method="POST" style="margin:0;">
+                    <input type="hidden" name="name" value="{{ item.name }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-circle">+</button>
+                </form>
+            </div>
         </div>
         {% endfor %}
     </div>
     {% endfor %}
 
-    <div class="cart-section">
-        <h2>Your Selection</h2>
-        {% if cart %}
-            {% for name, details in cart.items() %}
-            <div class="menu-item">
-                <span>{{ name }} (x{{ details.quantity }})</span>
-                <span>
-                    ₹{{ details.price * details.quantity }}
-                    <a href="{{ url_for('remove_item', name=name) }}" class="remove-btn">[Remove]</a>
-                </span>
-            </div>
-            {% endfor %}
-            <h3 style="text-align: right;">Total: ₹{{ total }}</h3>
-            <div style="text-align: right;">
-                <a href="{{ url_for('clear_cart') }}">Empty Cart</a>
-            </div>
-        {% else %}
-            <p>Your cart is empty.</p>
-        {% endif %}
-    </div>
+    {% if cart %}
+    <a href="{{ url_for('checkout') }}" class="view-cart-btn">View Cart & Checkout</a>
+    {% endif %}
 
 </body>
 </html>
